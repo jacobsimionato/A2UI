@@ -12,6 +12,10 @@
           "type": "string",
           "description": "The name of the action, taken from the component's `action.action` property."
         },
+        "surfaceId": {
+          "type": "string",
+          "description": "The `id` of the surface that the event originated from."
+        },
         "sourceComponentId": {
           "type": "string",
           "description": "The `id` of the component that triggered the event."

@@ -2,6 +2,10 @@
   "title": "A2UI Protocol message",
   "description": "A message from the server to the client, which can be one of several types.",
   "properties": {
+    "surfaceId": {
+      "type": "string",
+      "description": "An ID for the surface that the UI changes should be applied to. If this surface doesn't exist, it will be created. If this is not specified, the default surface will be used."
+    },
     "beginRendering": {
       "title": "BeginRendering Message",
       "description": "A schema for a BeginRendering message in the A2A streaming UI protocol. This message signals that the UI can now be rendered and provides initial root component and styling information.",
@@ -26,10 +30,6 @@
       "description": "A schema for a SurfaceUpdate message in the A2A streaming UI protocol.",
       "type": "object",
       "properties": {
-        "surfaceId": {
-          "type": "string",
-          "description": "An ID for the surface that the UI changes should be applied to. If this surface doesn't exist, it will be created. If this is not specified, the default surface will be used."
-        },
         "components": {
           "type": "array",
           "description": "A flat list of all component instances available for rendering. Components reference each other by ID. This property is REQUIRED.",
@@ -79,15 +79,8 @@
       "title": "SurfaceDeletion Message",
       "description": "A schema for a SurfaceDeletion message in the A2A streaming UI protocol. This message signals that a surface should be removed from the UI.",
       "type": "object",
-      "properties": {
-        "surfaceId": {
-          "type": "string",
-          "description": "The ID of the surface to be deleted. This property is REQUIRED."
-        }
-      },
-      "required": [
-        "surfaceId"
-      ]
+      "properties": {},
+      "required": []
     }
   }
 }
