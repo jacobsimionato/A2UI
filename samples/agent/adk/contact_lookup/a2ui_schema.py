@@ -620,10 +620,6 @@ A2UI_SCHEMA = r'''
                       "enableTime": {
                         "type": "boolean",
                         "description": "If true, allows the user to select a time."
-                      },
-                      "outputFormat": {
-                        "type": "string",
-                        "description": "The desired format for the output string after a date or time is selected."
                       }
                     },
                     "required": ["value"]
