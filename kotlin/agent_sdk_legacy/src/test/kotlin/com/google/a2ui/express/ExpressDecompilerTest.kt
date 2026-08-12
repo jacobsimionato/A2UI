@@ -96,6 +96,8 @@ class ExpressDecompilerTest {
 
     val compiled = compiler.compile(dsl, surfaceId = "main") as JsonObject
     val decompiled = decompiler.decompile(compiled)
-    assertTrue(decompiled.contains("Event(\"submitDeal\", {rep: $/form/rep}, displayName=\"Save deal\")"))
+    assertTrue(
+      decompiled.contains("Event(\"submitDeal\", {rep: $/form/rep}, displayName=\"Save deal\")")
+    )
   }
 }

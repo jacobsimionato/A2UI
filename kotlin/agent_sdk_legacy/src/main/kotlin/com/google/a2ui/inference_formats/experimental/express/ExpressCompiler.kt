@@ -580,7 +580,8 @@ class ExpressCompiler(val catalog: A2uiCatalog, val version: String = "v1.0") {
 
           val compiledEvtName =
             if (fnKwargs.containsKey("name")) {
-              (compileValue(fnKwargs["name"], rawSymbols, ctx, isAction) as? JsonPrimitive)?.content ?: ""
+              (compileValue(fnKwargs["name"], rawSymbols, ctx, isAction) as? JsonPrimitive)?.content
+                ?: ""
             } else if (fnArgs.isNotEmpty()) {
               (compileValue(fnArgs[0], rawSymbols, ctx, isAction) as? JsonPrimitive)?.content ?: ""
             } else ""
@@ -637,10 +638,11 @@ class ExpressCompiler(val catalog: A2uiCatalog, val version: String = "v1.0") {
               (dnElem as? JsonPrimitive)?.content ?: dnElem.toString()
             } else null
 
-          val evtMap = mutableMapOf<String, JsonElement>(
-            "name" to JsonPrimitive(compiledEvtName),
-            "context" to anyToJsonElement(compiledContext),
-          )
+          val evtMap =
+            mutableMapOf<String, JsonElement>(
+              "name" to JsonPrimitive(compiledEvtName),
+              "context" to anyToJsonElement(compiledContext),
+            )
           if (!compiledDisplayName.isNullOrEmpty()) {
             evtMap["displayName"] = JsonPrimitive(compiledDisplayName)
           }

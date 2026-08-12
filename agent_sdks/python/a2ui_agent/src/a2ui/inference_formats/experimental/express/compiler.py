@@ -762,9 +762,9 @@ class ExpressCompiler:
                         compiled_event_name = ""
 
                     raw_context = fn_kwargs.get("context")
-                    raw_display_name = fn_kwargs.get(
-                        "displayName"
-                    ) or fn_kwargs.get("display_name")
+                    raw_display_name = fn_kwargs.get("displayName") or fn_kwargs.get(
+                        "display_name"
+                    )
 
                     if len(fn_args) == 3:
                         val1 = self._compile_value(

@@ -131,7 +131,9 @@ class ExpressCompilerTest {
     val envelope = compiler.compile(dsl) as JsonObject
     val createSurf = envelope["createSurface"] as JsonObject
     val components = createSurf["components"] as JsonArray
-    val buttonComp = components.first { ((it as JsonObject)["id"] as JsonPrimitive).content == "root" } as JsonObject
+    val buttonComp =
+      components.first { ((it as JsonObject)["id"] as JsonPrimitive).content == "root" }
+        as JsonObject
     val actionObj = buttonComp["action"] as JsonObject
     val eventObj = actionObj["event"] as JsonObject
     assertEquals("submitDeal", (eventObj["name"] as JsonPrimitive).content)

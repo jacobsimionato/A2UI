@@ -272,8 +272,9 @@ class ExpressDecompiler(val catalog: A2uiCatalog) {
           val evt = valElement["event"] as? JsonObject ?: JsonObject(emptyMap())
           val name = (evt["name"] as? JsonPrimitive)?.content ?: ""
           val ctx = evt["context"] as? JsonObject ?: JsonObject(emptyMap())
-          val displayName = (evt["displayName"] as? JsonPrimitive)?.content
-            ?: (evt["display_name"] as? JsonPrimitive)?.content
+          val displayName =
+            (evt["displayName"] as? JsonPrimitive)?.content
+              ?: (evt["display_name"] as? JsonPrimitive)?.content
           val ctxReprs = mutableListOf<String>()
           for ((k, v) in ctx) {
             ctxReprs.add("$k: ${decompileValue(v, compIds)}")
