@@ -89,7 +89,7 @@ class ExpressDecompilerTest {
 
     val dsl =
       """
-      root = Button(saveLabel, "primary", Event("submitDeal", {rep: $/form/rep}, displayName="Save deal"))
+      root = Button(child=saveLabel, action=Event("submitDeal", {rep: $/form/rep}, displayName="Save deal"))
       saveLabel = Text("Save")
       """
         .trimIndent()
