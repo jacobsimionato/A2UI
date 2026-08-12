@@ -748,29 +748,89 @@ class ExpressCompiler:
 
                 # Is it a reserved Event signature?
                 if fn_name == "Event":
-                    compiled_event_name = (
-                        self._compile_value(fn_args[0], raw_symbols, ctx, is_action)
-                        if len(fn_args) > 0
-                        else ""
-                    )
-                    raw_context = (
-                        self._compile_value(fn_args[1], raw_symbols, ctx, is_action)
-                        if len(fn_args) > 1
-                        else {}
-                    )
+                    fn_kwargs = val.get("kwargs", {})
+                    raw_name = fn_kwargs.get("name")
+                    if raw_name is not None:
+                        compiled_event_name = self._compile_value(
+                            raw_name, raw_symbols, ctx, is_action
+                        )
+                    elif len(fn_args) > 0:
+                        compiled_event_name = self._compile_value(
+                            fn_args[0], raw_symbols, ctx, is_action
+                        )
+                    else:
+                        compiled_event_name = ""
+
+                    raw_context = fn_kwargs.get("context")
+                    raw_display_name = fn_kwargs.get(
+                        "displayName"
+                    ) or fn_kwargs.get("display_name")
+
+                    if len(fn_args) == 3:
+                        val1 = self._compile_value(
+                            fn_args[1], raw_symbols, ctx, is_action
+                        )
+                        val2 = self._compile_value(
+                            fn_args[2], raw_symbols, ctx, is_action
+                        )
+                        if isinstance(val1, (dict, list)):
+                            if raw_context is None:
+                                raw_context = val1
+                            if raw_display_name is None:
+                                raw_display_name = val2
+                        else:
+                            if raw_display_name is None:
+                                raw_display_name = val1
+                            if raw_context is None:
+                                raw_context = val2
+                    elif len(fn_args) == 2:
+                        val1 = self._compile_value(
+                            fn_args[1], raw_symbols, ctx, is_action
+                        )
+                        if isinstance(val1, (dict, list)):
+                            if raw_context is None:
+                                raw_context = val1
+                        else:
+                            if raw_display_name is None:
+                                raw_display_name = val1
+
                     compiled_context = {}
-                    if isinstance(raw_context, dict):
-                        compiled_context.update(raw_context)
-                    elif isinstance(raw_context, list):
-                        for item in raw_context:
-                            if isinstance(item, dict):
-                                compiled_context.update(item)
-                    return {
-                        "event": {
-                            "name": compiled_event_name,
-                            "context": compiled_context,
-                        }
+                    if raw_context is not None:
+                        ctx_obj = (
+                            raw_context
+                            if isinstance(raw_context, (dict, list))
+                            else self._compile_value(
+                                raw_context, raw_symbols, ctx, is_action
+                            )
+                        )
+                        if isinstance(ctx_obj, dict):
+                            compiled_context.update(ctx_obj)
+                        elif isinstance(ctx_obj, list):
+                            for item in ctx_obj:
+                                if isinstance(item, dict):
+                                    compiled_context.update(item)
+
+                    event_dict = {
+                        "name": (
+                            str(compiled_event_name)
+                            if compiled_event_name is not None
+                            else ""
+                        ),
+                        "context": compiled_context,
                     }
+
+                    if raw_display_name is not None:
+                        compiled_dn = (
+                            raw_display_name
+                            if isinstance(raw_display_name, str)
+                            else self._compile_value(
+                                raw_display_name, raw_symbols, ctx, is_action
+                            )
+                        )
+                        if compiled_dn:
+                            event_dict["displayName"] = str(compiled_dn)
+
+                    return {"event": event_dict}
 
                 # Is it a regular catalog function?
                 if fn_name in self.helper.functions:

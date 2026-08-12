@@ -72,8 +72,10 @@ export class SurfaceModel<T extends ComponentApi = ComponentApi> {
    */
   async dispatchAction(payload: any, sourceComponentId: string): Promise<void> {
     if (payload && typeof payload === 'object' && 'event' in payload && payload.event) {
+      const displayName = payload.event.displayName || payload.event.display_name;
       const actionToValidate = {
         name: payload.event.name,
+        ...(displayName ? {displayName} : {}),
         surfaceId: this.id,
         sourceComponentId,
         timestamp: new Date().toISOString(),

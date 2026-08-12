@@ -120,6 +120,25 @@ class ExpressCompilerTest {
   }
 
   @Test
+  fun testEventDisplayNameCompilation() {
+    val compiler = ExpressCompiler(catalog)
+    val dsl =
+      """
+      root = Button(saveLabel, "primary", Event("submitDeal", {rep: $/form/rep}, displayName="Save deal"))
+      saveLabel = Text("Save")
+      """
+        .trimIndent()
+    val envelope = compiler.compile(dsl) as JsonObject
+    val createSurf = envelope["createSurface"] as JsonObject
+    val components = createSurf["components"] as JsonArray
+    val buttonComp = components.first { ((it as JsonObject)["id"] as JsonPrimitive).content == "root" } as JsonObject
+    val actionObj = buttonComp["action"] as JsonObject
+    val eventObj = actionObj["event"] as JsonObject
+    assertEquals("submitDeal", (eventObj["name"] as JsonPrimitive).content)
+    assertEquals("Save deal", (eventObj["displayName"] as JsonPrimitive).content)
+  }
+
+  @Test
   fun testCompilationV09MultiMessage() {
     val compiler = ExpressCompiler(catalog, version = "v0.9")
     val dsl =

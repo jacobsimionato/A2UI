@@ -71,6 +71,8 @@ The host compiler will compile your A2UI Express output into the correct JSON en
 
 8. Action events: represent server-side actions using the Event helper:
    Event("save_deal", {rep: $/form/rep})
+   To include an optional user-visible description for display in conversation history, pass `displayName`:
+   Event("save_deal", {rep: $/form/rep}, displayName="Saved deal")
 
 9. Nested functions: call client functions directly using catalog signatures, for example myFunction("value").
 

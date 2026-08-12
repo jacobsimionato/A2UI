@@ -121,7 +121,7 @@ To support catalog flexibility and avoid hardcoding specific formatting or actio
 - Client functions are written as `<FunctionName>(<args>)`, matching the exact function names registered in the loaded catalog.
 - If the client catalog contains a text formatting helper (such as `formatString`), it is called explicitly: `welcomeText = Text(formatString("Welcome, ${/user/firstName}!"))`. This prevents failures if a client catalog uses a different naming convention for interpolation.
 - Local actions use this same signature to trigger behaviors, for example `openUrl("https://example.com")`. The compiler maps these to standard client function actions.
-- Server events use a reserved `Event` signature to declare backend actions, for example `Event("save_deal", {rep: $/form/rep})`.
+- Server events use a reserved `Event` signature to declare backend actions, for example `Event("save_deal", {rep: $/form/rep})`. An optional `displayName` parameter can be provided to specify user-visible feedback text for display in conversation history: `Event("save_deal", {rep: $/form/rep}, displayName="Saved deal")`.
 
 ### Validation and logic expressions
 

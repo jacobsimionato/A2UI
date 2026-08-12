@@ -575,38 +575,77 @@ class ExpressCompiler(val catalog: A2uiCatalog, val version: String = "v1.0") {
         }
 
         if (fnName == "Event") {
+          @Suppress("UNCHECKED_CAST")
+          val fnKwargs = valItem["kwargs"] as? Map<String, Any?> ?: emptyMap()
+
           val compiledEvtName =
-            if (fnArgs.isNotEmpty()) {
+            if (fnKwargs.containsKey("name")) {
+              (compileValue(fnKwargs["name"], rawSymbols, ctx, isAction) as? JsonPrimitive)?.content ?: ""
+            } else if (fnArgs.isNotEmpty()) {
               (compileValue(fnArgs[0], rawSymbols, ctx, isAction) as? JsonPrimitive)?.content ?: ""
             } else ""
 
-          val rawContext =
-            if (fnArgs.size > 1) {
-              jsonElementToAny(compileValue(fnArgs[1], rawSymbols, ctx, isAction))
-            } else emptyMap<String, Any?>()
+          var rawContext: Any? = null
+          var rawDisplayName: Any? = null
+
+          if (fnKwargs.containsKey("displayName")) {
+            rawDisplayName = fnKwargs["displayName"]
+          } else if (fnKwargs.containsKey("display_name")) {
+            rawDisplayName = fnKwargs["display_name"]
+          }
+
+          if (fnKwargs.containsKey("context")) {
+            rawContext = fnKwargs["context"]
+          }
+
+          if (fnArgs.size == 3) {
+            val val1 = jsonElementToAny(compileValue(fnArgs[1], rawSymbols, ctx, isAction))
+            val val2 = jsonElementToAny(compileValue(fnArgs[2], rawSymbols, ctx, isAction))
+            if (val1 is Map<*, *> || val1 is List<*>) {
+              if (rawContext == null) rawContext = val1
+              if (rawDisplayName == null) rawDisplayName = val2
+            } else {
+              if (rawDisplayName == null) rawDisplayName = val1
+              if (rawContext == null) rawContext = val2
+            }
+          } else if (fnArgs.size == 2) {
+            val val1 = jsonElementToAny(compileValue(fnArgs[1], rawSymbols, ctx, isAction))
+            if (val1 is Map<*, *> || val1 is List<*>) {
+              if (rawContext == null) rawContext = val1
+            } else {
+              if (rawDisplayName == null) rawDisplayName = val1
+            }
+          }
 
           val compiledContext = mutableMapOf<String, Any?>()
-          if (rawContext is Map<*, *>) {
-            @Suppress("UNCHECKED_CAST") compiledContext.putAll(rawContext as Map<String, Any?>)
-          } else if (rawContext is List<*>) {
-            for (item in rawContext) {
-              if (item is Map<*, *>) {
-                @Suppress("UNCHECKED_CAST") compiledContext.putAll(item as Map<String, Any?>)
+          if (rawContext != null) {
+            val ctxObj = jsonElementToAny(compileValue(rawContext, rawSymbols, ctx, isAction))
+            if (ctxObj is Map<*, *>) {
+              @Suppress("UNCHECKED_CAST") compiledContext.putAll(ctxObj as Map<String, Any?>)
+            } else if (ctxObj is List<*>) {
+              for (item in ctxObj) {
+                if (item is Map<*, *>) {
+                  @Suppress("UNCHECKED_CAST") compiledContext.putAll(item as Map<String, Any?>)
+                }
               }
             }
           }
 
-          return JsonObject(
-            mapOf(
-              "event" to
-                JsonObject(
-                  mapOf(
-                    "name" to JsonPrimitive(compiledEvtName),
-                    "context" to anyToJsonElement(compiledContext),
-                  )
-                )
-            )
+          val compiledDisplayName =
+            if (rawDisplayName != null) {
+              val dnElem = compileValue(rawDisplayName, rawSymbols, ctx, isAction)
+              (dnElem as? JsonPrimitive)?.content ?: dnElem.toString()
+            } else null
+
+          val evtMap = mutableMapOf<String, JsonElement>(
+            "name" to JsonPrimitive(compiledEvtName),
+            "context" to anyToJsonElement(compiledContext),
           )
+          if (!compiledDisplayName.isNullOrEmpty()) {
+            evtMap["displayName"] = JsonPrimitive(compiledDisplayName)
+          }
+
+          return JsonObject(mapOf("event" to JsonObject(evtMap)))
         }
 
         if (helper.functions.containsKey(fnName)) {

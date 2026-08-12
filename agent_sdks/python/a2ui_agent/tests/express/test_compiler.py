@@ -808,6 +808,25 @@ root = Text("Body")"""
         self.assertEqual(envelopes[0]["createSurface"]["surfaceId"], "header-surface")
         self.assertEqual(envelopes[1]["createSurface"]["surfaceId"], "body-surface")
 
+    def test_event_display_name(self):
+        """Validates compilation of Event with optional displayName property."""
+        compiler = ExpressCompiler(self.catalog)
+        dsl = """root = Button(saveLabel, "primary", Event("submitDeal", {rep: $/form/rep}, displayName="Save deal"))
+saveLabel = Text("Save")"""
+        envelope = compiler.compile(dsl)[0]
+        components = envelope["createSurface"]["components"]
+        button_comp = next(c for c in components if c["id"] == "root")
+        self.assertEqual(
+            button_comp["action"],
+            {
+                "event": {
+                    "name": "submitDeal",
+                    "displayName": "Save deal",
+                    "context": {"rep": {"path": "/form/rep"}},
+                }
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -415,6 +415,36 @@ class TestExpressParser(unittest.TestCase):
         decompiled = decompiler.decompile(envelope)
         self.assertIn('surface("update-surf-789")', decompiled)
 
+    def test_decompile_event_with_display_name(self):
+        """Test decompiling an Event action with displayName."""
+        decompiler = ExpressParser(self.catalog)
+        envelope = {
+            "version": "v1.0",
+            "createSurface": {
+                "surfaceId": "surf_1",
+                "components": [
+                    {
+                        "id": "root",
+                        "component": "Button",
+                        "child": "btnText",
+                        "action": {
+                            "event": {
+                                "name": "submit_form",
+                                "displayName": "Submitted form",
+                                "context": {"field1": "val1"},
+                            }
+                        },
+                    },
+                    {"id": "btnText", "component": "Text", "text": "Submit"},
+                ],
+            },
+        }
+        decompiled = decompiler.decompile(envelope)
+        self.assertIn(
+            'Event("submit_form", {field1: "val1"}, displayName="Submitted form")',
+            decompiled,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -366,17 +366,25 @@ class _ExpressDecompiler:
                 return f"${path_str}"
 
             if "event" in val:
-                # Decompile server event: Event("name", context)
+                # Decompile server event: Event("name", context, displayName="...")
                 evt = val["event"]
                 name = evt.get("name", "")
                 ctx = evt.get("context", {})
+                display_name = evt.get("displayName") or evt.get("display_name")
                 ctx_reprs = []
                 for k, v in ctx.items():
                     ctx_reprs.append(
                         f"{k}: {self._decompile_value(v, comp_ids, False)}"
                     )
-                if ctx_reprs:
-                    return f'Event("{name}", {{{", ".join(ctx_reprs)}}})'
+                ctx_str = ", ".join(ctx_reprs)
+                if ctx_reprs and display_name:
+                    dn_repr = self._decompile_value(display_name, comp_ids, False)
+                    return f'Event("{name}", {{{ctx_str}}}, displayName={dn_repr})'
+                elif ctx_reprs:
+                    return f'Event("{name}", {{{ctx_str}}})'
+                elif display_name:
+                    dn_repr = self._decompile_value(display_name, comp_ids, False)
+                    return f'Event("{name}", displayName={dn_repr})'
                 return f'Event("{name}")'
 
             if "functionCall" in val:

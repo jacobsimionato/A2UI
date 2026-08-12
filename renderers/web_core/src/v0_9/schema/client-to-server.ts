@@ -25,6 +25,12 @@ export const A2uiClientActionSchema = z
     name: z
       .string()
       .describe("The name of the action, taken from the component's action.event.name property."),
+    displayName: z
+      .string()
+      .optional()
+      .describe(
+        "An optional human-readable string associated with the action, taken from the component's action.event.displayName property.",
+      ),
     surfaceId: z.string().describe('The id of the surface where the event originated.'),
     sourceComponentId: z.string().describe('The id of the component that triggered the event.'),
     timestamp: z.string().datetime().describe('An ISO 8601 timestamp of when the event occurred.'),

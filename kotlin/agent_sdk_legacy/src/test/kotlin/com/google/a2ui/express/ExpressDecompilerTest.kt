@@ -81,4 +81,21 @@ class ExpressDecompilerTest {
     assertTrue(decompiled.contains("root = Column"))
     assertTrue(decompiled.contains("txt = Text(\"Hello World\")"))
   }
+
+  @Test
+  fun testEventDisplayNameDecompilation() {
+    val compiler = ExpressCompiler(catalog)
+    val decompiler = ExpressDecompiler(catalog)
+
+    val dsl =
+      """
+      root = Button(saveLabel, "primary", Event("submitDeal", {rep: $/form/rep}, displayName="Save deal"))
+      saveLabel = Text("Save")
+      """
+        .trimIndent()
+
+    val compiled = compiler.compile(dsl, surfaceId = "main") as JsonObject
+    val decompiled = decompiler.decompile(compiled)
+    assertTrue(decompiled.contains("Event(\"submitDeal\", {rep: $/form/rep}, displayName=\"Save deal\")"))
+  }
 }
